@@ -1,0 +1,27 @@
+安卓实现有返回结果的页面跳转（通过请求标识和结果标识进行对应的匹配）
+当前页面（发出请求的页面）
+调用方法：starActivityForResult（Intent intent，int requestCode）
+            第一个参数是一个intent对象，用来启动另一个页面
+			第二个参数是一个int类型的数据，顾名思义，代表了请求的标识
+重写方法：onActivityResult（int ruquestCode,int resultCode,Intent data）
+            在此方法中对回传的数据进行操作
+		    第一个参数就是当前页面的请求标识
+			第二个就是回应请求的页面的标识
+			第三个Intent对象封装了新启动的页面回传的数据
+			注：一个页面可以有多个requestCode和resultCode
+			
+			
+			Intent提供的获取和添加数据的方法：
+			1.putExtras（Bundle data）：想Intent对象中放入携带的数据包
+			2.putExtra（String name，Xxx value）：直接往intent中放入数据，不过是按key—value的形式存入的
+			3.Bundle getExtras（）：取出intent中的数据包
+			4.getXxxExtra（String name）：直接通过key值取出数据
+			
+			
+			Bundle提供的获取和存入数据的方法
+			1.putExtra（String name，Xxx value）
+			2.getXxxExtra（String name）
+
+新启动的页面
+调用方法：setResult（int resultCode，Intent data）
+            注：此时的intent对象只是用来封装数据，并不是用来启动activity，所以调用的构造器是无参构造器，否则将不会有数据回传
