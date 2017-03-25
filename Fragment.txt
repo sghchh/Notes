@@ -1,0 +1,36 @@
+一 Activity静态加载Fragment
+   两个特殊的属性
+   1.android：name属性，属性值为想要加载的Fragment的实现类的“包名。实现类名”
+   2.android：id属性，这个属性不同于其他控件，想要加载Fragment就必须有这个属性（或者android：tag属性）
+   注：在Activity的布局文件中配置完Fragment之后，在Activity的java代码中不用findviewbyid（id）来显示添加
+   
+   
+二 Fragment的实现
+   创建Fragment需要创建Fragment的实现类，即继承Fragment的基类
+   需要重写的方法
+   1.onCreate（）方法：当创建一个Fragment对象时回调此方法，在这个方法中初始化一些view之外的一些东西
+   2.View onCreateView（LayoutInflater inflater，ViewGroup container，Bundle savedInstanceState）方法：当Fragment绘制界面组件时回调此方法，这里就涉及到如何将一个布局文件转化成一个view返回，通过inflater.inflate（R.layout.xxx,container，boolean false/true）。
+   （1）第一个参数是加载的layout布局文件，就是Fragment加载的布局
+   （2）第二个是viewgroup参数，指的是哪个容器来加载这个布局，通常是oncreate方法参数的第二个
+   （3）布尔类型，是否返回viewgroup
+   
+   
+三 Fragment事物管理和与Activity的通信
+   1.Activity管理Fragment：通过FragmentManager工具类来实现
+   FragmentManager有如下几个方法
+   （1）findFragmentById（）或findFragmentByTag（）方法来获取指定的Fragment
+   （2）popBackStack（）方法将Fragment从后台栈弹出
+   （3）addOnBackStackChangeListener（）注册一个监听器，用于监听后台栈的变化
+   2.Fragment的添加，删除，替换等事物操作：通过FragmentTransaction对象来实现
+   （1）Activity可以通过FragmentManager的beginTransaction方法获得FragmentTransaction对象
+   （2）通过FragmentTransaction对象的add（），replace（）等方法来实现，最后都要调用FragmentTransact     ion对象的commit（）方法来提交
+   3.Activity向Fragment中传递数据
+   （1）创建Bundle数据对象，并往里面添加数据：Bundle bundle=new        Bundle（），bundle。putXxx（key，values）；
+   （2）创建一个要实现的Fragment对象：FragmentSend（自定义的想要实现的Fragment） fragment=new   FragmentSend（）；
+   （3）为该Fragment对象设置Argument：fragment.setArguments(bundle);
+   注：次数设置了Arguments，所以定义Fragment的时候一定要有相应的处理这个从Activity得到的数据的代码
+   （4）调用FragmentTransaction对象的replace等方法，并commit提交
+   3.Fragment向Activity发送数据
+   （1）在Fragment中定义一个接口，并让Activity继承这个接口，实现里面的方法
+   （2）在Fragment中通过这个接口方法的调用来实现数据处理
+   要有一步Name（定义的接口的名字）=（Name）getActivity（）；之后才调用接口里的方法
