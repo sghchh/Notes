@@ -1,0 +1,23 @@
+ 进度条也是UI界面中一种非常实用的组件，通常用于向用户显示某个耗时操作完成的的百分比。进度条可以动态的显示进度，因此避免长时间的执行某个耗时的操作，让用户感觉程序失去了响应，从而更好的提高用户界面的友好性。
+
+     Android支持几种风格的进度条，通过style属性可以为ProgressBar指定风格。该属性克支持如下几个属性值：
+•@android:style/Widget.ProgressBar.Horizontal：水平进度条。
+•@android:style/Widget.ProgressBar.Inverse：普通大小的环形进度条。
+•@android:style/Widget.RpogressBar.Large：大环形进度条。
+•@android:style/Widget.ProgressBar.Large.Inverse：大环形进度条。
+•@android:style/Wdget.ProgressBar.Small：小环形进度条。
+•@android:style/Widget.ProgressBar.Small.Inverse：小环形进度条。  
+
+     其中android：progressDrawable用于指定进度条的轨道的绘制形式，该属性可指定为一个LayerDrawable对象（该对象可通过在XML文件中用<layer-list>元素进行配置）的引用。
+
+     ProgressBar提供如下方法来操作进度。
+•setProgress(int)：设置进度的完成百分比。
+•incrementProgressBy(int)：设置进度条的进度增加或减少。当参数为正数时进度增加；当参数为负数时进度减少。
+其他的属性：
+    1.android：max       设置该进度条的最大值
+	2.android：progress   设置该进度条的已完成进度
+	3.android：indeterminate      该属性值为true时，设置进度条不精确显示进度
+基本就这几个属性，还有其他的用到的时候不妨看看
+
+二。SeekBar（拖动条）
+   seekBar是ProgressBar的子类，所以以上的所有属性，seekbar都有，另外seekbar有一个android：thumb属性引用一个drawable资源来作为滑动块的图标
