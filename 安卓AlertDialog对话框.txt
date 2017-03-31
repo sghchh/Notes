@@ -1,0 +1,18 @@
+安卓提供了丰富的对话框，其中AlertDialog功能最为丰富
+AlertDialog对话框分为几个区域：图标区（setIcon方法来设置），标题区（setTitle方法来设置），内容区（最为复杂，最为自由，是区分对话框的地方），按钮区（setPositiveButton，setNegativeButton，setNeutralButton来实现）
+
+
+所以创建对话框的流程就是：
+   1.创建AlertDialog.Bulider对象
+   2.调用AlertDialog.Bulider对象的setTitle，setIcon，相关方法设置对话框内容，setPositiveButton，setNegativeButton，setNeutralButton
+   3.调用AlertDialog.Bulider对象的create方法
+   4.调用AlertDialog.Bulider对象是show方法
+   
+   
+具体设置对话框内容的方法：
+   1.setMessage（String）：就是直接在内容区写入文本
+   2.setItems（T[]，OnClickListener）：简单列表项对话框，第一个数组用来填充显示的文本，第二个监听器用来监听每个item被点击的事件
+   3.setSingleChoiceItems（T[],int,OnClickListener)：单选列表项对话框，第二个int类型的参数是表示初始时哪个被选中，如：2，则表示第三个框被选中
+   4.setMultiChoiceItems（T[]，boolean[],OnMultiChoiceClickListenter）:多选列表项对话框，第二个参数是一个布尔类型的数组，用来表示初始时各个选择框的状态是选中还是未选中
+   5.setAdapter（ListAdapter，OnClickListener）：zidingyi列表项对话框，第一个参数是个适配器
+   6.setView（resID/View）：两种构造器，这个的监听事件在view中实现
