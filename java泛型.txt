@@ -1,0 +1,58 @@
+    java泛型的产生背景：我们将数据放入Java集合中后集合就会忘记存入的类型，统统转化为object类型，这就导致了在取出数据的时候必须强制转
+换，这就导致了代码的臃肿。而泛型就是解决这种问题的，加入泛型后集合可以记住集合中的类型，并且在编译时检查集合中元素的类型，如果试
+图往集合中加入不满足类型的数据，系统就会报错。
+1.Java7之后支持用泛型定义变量后，构造器的后面只需添加一个尖括号就行了，不用再次制定类型了。
+  如：List<String> list=new ArrayList<>();
+2.java支持在定义类，接口的时候使用泛型，需要注意：
+               1.在使用泛型定义的时候可以不为尖括号中的类型指定确定的类型而用一个字母代替，同时定义的类中的变量，方法中都可以将这个字
+			   母当做一个确定的类型来处理。
+			   2.定义泛型类或接口的时候，构造器还是原来的形式，不能在构造器的后面加尖括号。但是在使用的时候，构造器的后面就得加尖括号了
+			   如：public class Text<T> {
+	                 private T content;          //T可以看成一个确定的类型来使用
+	                 public Text(T content)      //构造器定义时不能加尖括号
+	                    {
+	                 	this.content=content;
+	                }
+	                 public static void main(String[]args)
+	                  {
+	                    	Text<String> text=new Text<>("泛型测试");    //调用构造器的时候，需要加构造器
+		                    System.out.println(text.content);
+	                  }
+                    }
+3.当子类继承泛型父类的时候，需要给父类指定类型形参
+class Text<T> {
+	public T content;
+	public Text(T content)
+	{
+		this.content=content;
+	}
+}
+
+public class MyText extends Text<String>     //此处父类必须指定类型
+{
+	public MyText(String a)
+	{
+		super(a);
+	}
+	public static void main(String[]args)
+	{
+		MyText text=new MyText("子类继承泛型父类");
+		System.out.println(text.content);
+	}
+}
+4.不存在泛型类，就那第一个代码来说明，编译后只会生成一个。class文件，即Text<int> a,和Text<String> b。这两个对象都是Text<T>
+类的对象
+public class Test<T> {
+	public T t;
+	public Test(T t)
+	{
+		this.t=t;
+	}
+
+	public static void main(String[]args)
+	{
+		Test<String> a=new Test<>("测试");
+		Test<Integer> b=new Test<>(4);
+		System.out.println(a.getClass()==b.getClass());   //将输出true
+	}
+}

@@ -1,0 +1,76 @@
+public class ScannerTest
+{
+    public static void main(){
+         Scanner sc=new Scanner(System.in);
+          while (sc.hasNext)
+          {
+             System.out.println(sc.next());
+               }
+         Scanner scanner=new Scanner(new File("D://text.txt"));
+            while (scanner.hasNextLine())
+         {
+             System.out.println(scanner.next());
+}
+}
+}
+
+
+
+public class StringText{
+     public static void main(){
+         StringBuffer sb=new StringBuffer("hello world");
+         sb.append("hello java");
+         System.out.println(sb);
+         sb.insert(0,"yes");
+         System.out.println(sb);
+         String string =new String("good good study,day day up");
+         byte[] bytes=getBytes(string);
+         for (byte a | bytes)
+           {
+               System.out.println(a); 
+               }
+        }
+}
+
+
+
+
+java中的伪随机数，两种构造器：1.使用默认的系统当前的时间作为种子   2.显示传入一个long行整数作为种子
+为什么是伪随机数：当两个Random对象使用同一个种子，且顺序调用方法一样，那么这两个random对象生成的数据都一样
+public class {
+    public static void main(){
+    //为rd设置一个种子，用来限定生成随机数的范围
+    Random rd=new Random(50);
+    System.out.println(rd.nextInt());
+    System.out.println(rd.nextFloat());
+    System.out.println(rd.nextBoolean());
+
+    Random rand=new Random(50);
+    System.out.println(rand.nextInt());
+    System.out.println(rand.nextFloat());
+    System.out.println(rand.nextBoolean());
+
+    //生成特定段上的随机数
+    Random rand1=new Random();
+    //生成a，b之间的随机数
+    System.out.println(rand1.nextInt(int a,int b));
+    //生成特定数集中的随机数
+    int[] ints=new int[]{1,2,3,4,5};
+    Random rand2=new Random();
+    System.out.println(rand2.nextInt(ints));
+        }
+
+}
+
+
+正则表达式的使用及定义，Pattern是正则表达式编译后在内存中的保存形式，因此正则表达式必须先被编译为Pattern对象，然后再由Pattern对象创建Matcher对象，通过Matcher对象执行对字符串的操作。
+public class PatternTest{
+  public void main(){
+  String str=new String("hello,world!");
+   //匹配所有的单词字符
+  Pattern pattern=Pattern.compile("\\w*");
+  Matcher matcher =pattern.matcher(str);
+  System.out.println(matcher.matches());
+  System.out.println(matcher.group());
+  }
+}
