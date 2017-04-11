@@ -1,0 +1,5 @@
+1.DrawerLayout也是一个布局控件，但这个布局控件自带滑动功能，只要写完“左右”菜单的布局，就能有滑动效果。
+2.官方建议（实际上基本算作是要求）将DrawerLayout作为根布局，否则可能出现滑动效果被屏蔽的现象；主内容区的布局代码要放在侧滑菜单布局的前面，并且抽屉式导航栏必须位于内容顶部；侧滑菜单的布局必须设置layout_gravity属性（属性值为：left/start时代表该布局是左侧菜单，end/right代表右侧菜单）
+3.DrawerLayout的滑动除了这个控件自带的滑动功能外，也可以通过点击事件来实现滑动。实现的方法是DrawerLayout对象的openDrawer（）和closeDrawer（）方法，因此，需要先获取DrawerLayout对象才行，可以通过findviewbyid（）来实现。
+4.DrawerLayout的滑动是可以被监听到的，实现是为DrawerLayout对象setDrawerListener（new DrawerLayout.DrawerListener）来设置一个监听器，其中要实现的方法有：onDrawerSlide(View drawerView, float slideOffset)；onDrawerOpened(View drawerView)；onDrawerClosed(View drawerView) ；onDrawerStateChanged(int newState)。。。这些方法主要用来实现数据的交互（比如侧拉菜单关闭后主界面需要更新一些获取的数据），事件的传递
+5.官方推荐的使用ActionBar来实现复杂的操作
