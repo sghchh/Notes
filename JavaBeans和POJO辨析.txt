@@ -1,0 +1,32 @@
+POJO 和JavaBean是我们常见的两个关键字，一般容易混淆，POJO全称是Plain Ordinary Java Object / Pure Old Java Object，中文可以翻译成：普通Java类，具有一部分getter/setter方法的那种类就可以称作POJO，但是JavaBean则比 POJO复杂很多， Java Bean 是可复用的组件，对 Java Bean 并没有严格的规范，理论上讲，任何一个 Java 类都可以是一个 Bean 。但通常情况下，由于 Java Bean 是被容器所创建（如 Tomcat) 的，所以 Java Bean 应具有一个无参的构造器，另外，通常 Java Bean 还要实现 Serializable 接口用于实现 Bean 的持久性。 Java Bean 是不能被跨进程访问的 
+
+JavaBean是一种组件技术，就好像你做了一个扳子，而这个扳子会在很多地方被拿去用，这个扳子也提供多种功能(你可以拿这个扳子扳、锤、撬等等)，而这个扳子就是一个组件。 
+一般在web应用程序中建立一个数据库的映射对象时，我们只能称它为POJO。 
+
+
+POJO(Plain Old Java Object)这个名字用来强调它是一个普通java对象，而不是一个特殊的对象。 
+2005年11月时，“POJO”主要用来指代那些没用遵从特定的Java对象模型，约定或框架如EJB的Java对象. 
+理想地讲，一个POJO是一个不受任何限制的Java对象（除了Java语言规范）。例如一个POJO不应该是 
+
+1. 扩展预定的类，如 public class Foo extends javax.servlet.http.HttpServlet { ... 
+2. 实现预定的接口，如 public class Bar implements javax.ejb.EntityBean { ... 
+3. 包含预定的标注，如 @javax.ejb.Entity public class Baz{ ... 
+
+然后，因为技术上的困难及其他原因，许多兼容POJO风格的软件产品或框架事实上仍然要求使用预定的标注，譬如用于更方便的持久化。 
+JavaBean 是一种JAVA语言写成的可重用组件。它的方法命名，构造及行为必须符合特定的约定： 
+
+1. 这个类必须有一个公共的缺省构造函数。 
+2. 这个类的属性使用getter和setter来访问，其他方法遵从标准命名规范。 
+3. 这个类应是可序列化的。 
+
+因为这些要求主要是靠约定而不是靠实现接口，所以许多开发者把JavaBean看作遵从特定命名约定的POJO。 
+简而言之，当一个Pojo可序列化，有一个无参的构造函数，使用getter和setter方法来访问属性时，他就是一个JavaBean。 
+
+我的整理与总结： 
+一、对于java bean，就是一个java模型组件，他为使用java类提供了一种标准的格式，在用户程序和可视化管理工具中可以自动获得这种具有标准格式的类的信息，并能够创建和管理这些类。 
+java bean 可以使应用程序更加面向对象，可以把数据封装起来，把应用的业务逻辑和显示逻辑分离开，降低了开发的复杂程度和维护成本！ 
+JavaBean 是一种JAVA语言写成的可重用组件。为写成Jav 
+
+aBean，类必须是具体的和公共的，并且具有无参数的构造器。JavaBeans 通过提供符合一致性设计模式的公共方法将内部域暴露称为属性。众所周知，属性名称符合这种模式，其他Java 类可以通过自省机制发现和操作这些JavaBean 属性。 
+从编程的角度，也就是最基本的实现了get跟set方法的类。
+引自：https://wenku.baidu.com/view/eba89bbcf121dd36a32d828a.html

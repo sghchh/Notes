@@ -1,0 +1,102 @@
+安卓ActionBar是一个很好的导航工具
+1.ActionBar的获取：actionbar的获取很简单，只要将当前Activity或者Application的theme属性是Theme.Holo或者子类就行
+2.ActionBar的移除：
+      一。在theme设置时Theme.Holo.NoActionBar即可（既使用一个不包含ActionBar的主题），这里的Theme属性不一定是Theme.Holo，但是只要是最后是.NoActionBar结尾即可：如<style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+	  二。通过依次调用getActionBar（）来获得ActionBar对象，之后调用该对象的hide（）方法即可：ActionBar action=getActionBar（）；action.hide（）;
+	  注意：当创建一个ActionBar对象的时候，涉及到导包的过程这时候就有不同的版本了，一个是android.app.actionbar，这个包下创建的ActionBar对应的获得方法是getActionBar（总之亲自试验，获得这个对象后调用hide并没有什么卵用）；另一个是android.support.v7.app.actionbar，这个包下的获取ActionBar的方法是getSupportActionBar（）（经过试验，这个对象调用hide是管用的）
+3.为ActionBar设置文字内容很简单：通过Activity或者Application下的label属性设置想要的内容
+4.设置ActionBar的图标（这是最蛋疼的，不懂，好像涉及到support library的兼容问题，我创建项目的时候Activity继承的是android.support.v7.app.AppCompatActivity）。总之一句话直接在Activity或者Application下通过logo属性来指定图标是没效果的。具体的代码实现设置图标还得在onCreate方法中添加这么几句话：
+ActionBar actionBar=getSupportActionBar();
+        actionBar.setLogo(R.mipmap.ic_launcher);
+        actionBar.setDisplayUseLogoEnabled(true);
+        actionBar.setDisplayShowHomeEnabled(true);
+反正我现在是不懂为什么要这么做。。。。反正是成功了。。。。
+5.为ActionBar添加按钮：这是用处最大的了。这些按钮有自己的图标（menu的xml文件中的icon属性来指定）和文字（title属性来指定）。由于屏幕有限，按钮的文字是不会显示的（但我们还是要设置文字属性的，实践证明，不设置这个属性的话系统会有提示），当按钮过多的时候，显示不下的按钮会被放在overflow中，当点击这个overflow的时候，那些被隐藏的按钮就会被显示出来供用户来点击。
+为ActionBar添加按钮需要这几个步骤：
+   一。为这些按钮定义一个menu菜单资源文件，根元素是menu，每一个按钮是一个item子元素，这里的按钮并不是button等控件，他们通过icon来设置图标来可视化。另一个重要的属性是showAsAction：这个属性有三个值：1.always：表示总是显示在ActionBar中，当空间不够的时候不显示；2.ifRoom：表示如果有空间就显示，没有空间则放在overflow中；3.never永远放在overflow中
+   二.重写Activity中的onCreateOptionsMenu方法
+   <?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+    <item
+        android:id="@+id/delete"
+        android:title="删除"
+        android:icon="@mipmap/ic_launcher"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/search"
+        android:title="搜索"
+        android:icon="@mipmap/ic_launcher"
+        android:showAsAction="always"/>
+
+</menu>
+注意：menu资源文件系统默认没有创建这个路径，需要自己创建
+蓝色部分是需要自己写的
+细心的你有没有发现两个item属性定义的时候有什么不同吗，没错就是showAsAction属性。一个是app：showAsAction，另一个是android：showAsAction。。。哈哈，又是那个问题来了，support library兼容的问题。。实践证明，只有设置app：showAsAction属性才能达到预期的效果。
+@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater=getMenuInflater();
+        inflater.inflate(R.menu.actionbar,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+这样就实现了在ActionBar中添加按钮了
+6.为ActionBar添加点击事件
+需要重写Activity的onOptionsItemSelected（MenuItem item）方法
+@Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId())
+        {
+            case R.id.delete:
+                Toast.makeText(MainActivity.this,"删除按钮被点击了",Toast.LENGTH_LONG)
+                        .show();
+                return true;
+            case R.id.search:
+                Toast.makeText(MainActivity.this,"搜索按钮被点击了",Toast.LENGTH_LONG)
+                        .show();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+7.ActionBar导航
+在onCreate方法中添加这么一句：actionBar.setDisplayHomeAsUpEnabled(true);再次运行程序会发现ActionBar的左侧多出了一个箭头图标，没错，就是熟悉的“返回”按钮了。这个“返回”按钮有系统默认的id：R.id.home。。所以如果想添加点击事件就可以在
+public boolean onOptionsItemSelected(MenuItem item)方法中进行设置了。。。
+注意：如果只是简单的跳转到上一页，只需case R.id.home：finish（）；就行了。（但是官方并不推荐这么简单的功能，因为这和手机底部的返回键（back键）的功能重复了）。
+
+8.ActionView
+ActionView允许用户在不切换界面的情况下使用ActionView来替换一个ActionBar中已经存在的一个按钮。。比如：当用户在点击搜索（放大镜形状的按钮）后，界面没有切换的情况下，该按钮直接被一个输入框替代了。ActionView就是要实现这种效果。
+实现的方法也很简单，只需要在对应的item下设置actionViewClass属性就行了
+哈哈，经过实践，老问题又出现了，没错就是support library的兼容问题，因此这个属性应该这么定义：
+app:actionViewClass="android.support.v7.widget.SearchView"
+同时还要对showAsAction属性做一下修改“always|collapseActionView”添加的那部分的意思是ActionView收缩在这个item下
+   若想在ActionView展开和合并的时候实现一些操作，我们只需要注册一个ActionView监听器就能实现，这个过程有点复杂：
+   @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater=getMenuInflater();
+        inflater.inflate(R.menu.actionbar,menu);
+        MenuItem search=menu.findItem(R.id.search);
+        MenuItemCompat.setOnActionExpandListener(search, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                Toast.makeText(MainActivity.this,"搜索框被展开了",Toast.LENGTH_SHORT)
+                        .show();
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                Toast.makeText(MainActivity.this,"搜索框被收进去了",Toast.LENGTH_SHORT)
+                        .show();
+                return true;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
+    }
+	从这些代码来看ActionView确实是收缩在item之下的
+	MenuItem search=menu.findItem(R.id.search);
+        MenuItemCompat.setOnActionExpandListener(search, new MenuItemCompat.OnActionExpandListener()）；
+		而且若想获得ActionView，则需要添加代码SearchView s=search.getActionView()从这个获取ActionView的代码来看，更能说明ActionView是收缩在item中的

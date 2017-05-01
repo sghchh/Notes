@@ -1,0 +1,45 @@
+Bitmap是Android系统中的图像处理的最重要类之一。用它可以获取图像文件信息，进行图像剪切、旋转、缩放等操作，并可以指定格式保存图像文件。
+一.获得Bitmap位图的方法
+   1.通过Bitmap类
+   Bitmap类提供了以下几个static静态方法来创建一个Bitmap位图
+      public static Bitmap createBitmap(Bitmap src):以src为原图生成一个不可变的新图像
+	  public static Bitmap createBitmap(Bitmap src，int dstWidth,int dstHeight,boolean filter):以src为原图，创建一个新图并且指定新图的宽高以及是否可变
+	  public static Bitmap createBitmap(Bitmap src,int x,int y,int width,int height):以src为原图创建新图，并且指定起始的坐标以及新图的宽高
+	  public static Bitmap createBitmap(int width,int height,Config config):创建指定格式大小的位图
+   2.通过BitmapFactory工厂类
+     使用BitmapFactory工厂类可以从资源Files，streams（输入输出流），byte-arrays中解码生成Bitmap对象
+     这过程中用到的构造器中经常会出现一个Options形参，这个形参类有以下几个缺省值，只要创建一个Options对象后根据需要设置这几个值就行了：
+	 public boolean inJustDecodeBounds——如果设置为true，不获取图片，不分配内存，但会返回图片的高度宽度信息。 
+     public int inSampleSize——图片缩放的倍数。如果设为4，则宽和高都为原来的1/4，则图是原来的1/16。 
+     public int outWidth——获取图片的宽度值 
+     public int outHeight——获取图片的高度值 
+     public int inDensity——用于位图的像素压缩比 
+     public int inTargetDensity——用于目标位图的像素压缩比（要生成的位图） 
+     public boolean inScaled——设置为true时进行图片压缩，从inDensity到inTargetDensity。
+	 接下来就看看BitmapFactory工厂提供的几种获取位图的静态方法
+      读取一个文件路径得到一个位图，如果指定的文件为空或者不能解码成文件，则返回null：
+	  public static Bitmap decodeFile(String pathName, Options opts)
+	  public static Bitmap decodeFile(String pathName)
+	  读取一个资源文件得到一个位图。如果位图数据不能被解码，或者opts参数只请求大小信息时，则返回NuLL。 
+     （即当Options.inJustDecodeBounds=true,只请求图片的大小信息。） 
+      public static Bitmap decodeResource(Resources res, int id) 
+      public static Bitmap decodeResource(Resources res, int id, Options opts) 
+      从输入流中解码位图 
+      public static Bitmap decodeStream(InputStream is) 
+      从字节数组中解码生成不可变的位图 
+      public static Bitmap decodeByteArray(byte[] data, int offset, int length) 
+   3.通过BitmapDrawable类
+   继承于Drawable类，可以从文件路径，输入流，xml文件以及Bitmap中创建
+   常用的构造函数： 
+      Resources res=getResources();//获取资源 
+      public BitmapDrawable(Resources res)——创建一个空的drawable。（Response用来指定初始时所用的像素密度）替代public BitmapDrawable()方法（此方法不处理像素密度） 
+      public BitmapDrawable(Resources res, Bitmap bitmap)——类似于Bitamp类的静态方法，依照一个Bitmap创建一个Bitmap
+      public BitmapDrawable(Resources res, String filepath)——类似于BitmapFactory工厂类的方法，从一个文件路径中decode一个bitmap
+      public BitmapDrawable(Resources res, java.io.InputStream is)——类似于BitmapFactory工厂类的方法，从一个打开的输入流中decode一个bitmap
+	  
+二.显示Bitmap的方法
+   1.通过Canvas的drawBitmap实现
+   2.通过可以显示图片的控件来显示（需要将bitmap转换成bitmapdrawable）
+
+
+   
