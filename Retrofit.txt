@@ -1,0 +1,8 @@
+使用Retrofit进行网络请求的步骤：
+1.编写请求的接口：
+      要求：（1）通过@GET（）注解和@Query注解拼接最终的URL
+	        （2）定义一个返回为Call实例的方法（@Query注释的参数就是这个方法的参数），与Okhttp不同（okhttp是通过okhttpClient调用newCall方法得到的）的就是Retrofit是通过Retrofit对象调用这个方法获得的返回的Call对象
+2.通过Retrofit.builder创建一个Retrofit实例，并且完成相应的配置（baseURL等）
+3.让Retrofit实例调用create（接口.class）方法创建一个刚刚定义的那个接口的实例
+4.这个接口的实例调用自己内部的那个方法得到Call对象
+5.接下来就是通过对这个Call实例的操作来实现了，和okhttp有点类似

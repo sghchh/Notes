@@ -1,0 +1,19 @@
+IP协议：全称是Internet Protcol（协议），通过这个协议可以使Internet成为一个允许链接不同类型的计算机和不同操作系统的网络。说白了，通过这个协议计算机可以接受和发送数据，计算机可以连接上网络，而这个协议负责将数据分割成一个一个小包。这个协议只是负责分割成包，但不能解决传输过程中可能出现的问题。
+TCP协议：一种端对端的协议，它为两台计算机之间的链接起了重要的作用，TCP协议负责收集数据包，并将这些包按照适当的顺序放好传送，在接受端正确的还原。并且TCP支持重发机制。
+
+一.使用URL访问网络资源
+   1.URL（Uniform Resource Locator）对象代表统一资源定位器，它是指向互联网“资源”的指针。
+   通常情况下，URL可以由协议名，主机，端口，资源组成，即满足以下格式：
+   protoclo：//host:port/resourceName
+   如：http://www.crazyit.com（主机）/index.php
+   2.URL对象的几种方法：
+   String getFile()：获取此URL的资源名。
+   String getHost()：获取此URL的主机名。
+   String getPath()：获取此URL的路径部分。
+   String getPort()：获取此URL的端口号。
+   String getProtocol()：获取此URL的协议名称。
+   Sting getQuery()：获取此URL的查询字符串部分。
+   URLConnectionopenConnection（）：返回一个URLConnection对象，它表示到URL所引用的远程对象的连接。
+   InputStream openStream（）：打开此URL的链接，并返回一个用于读取该URL资源的InputStream。
+   疯狂安卓讲义上的URL下载图片的实现
+   https://github.com/sghchh/AndroidSimpleDemo/blob/master/URLPictureDownload/app/src/main/java/com/example/as/urlpicturedownload/MainActivity.java

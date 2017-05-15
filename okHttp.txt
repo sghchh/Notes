@@ -1,0 +1,39 @@
+okHttp中的核心类
+一.OkHttpClient
+   顾名思义，这个类代表了HTTP请求的客户端类，建议在一个程序中只应该执行一个new OkHttpClient（），将其作为全局实例进行保存。
+   构造方法：
+   1.直接调用new关键字的构造器，这种创建OkHttpClient对象的方法简单明了，但是功能低
+   2.通过OkHttpClient.Builder工具类来先进行一些设置后，最后调用build（）方法来创建一个OkHttpClient对象
+   可以配置OkHttpClient的一些参数，比如超时时间、缓存目录、代理、Authenticator等，那么就需要用到内部类OkHttpClient.Builder，设置如下所示：
+OkHttpClient client = new OkHttpClient.Builder().
+        readTimeout(30, TimeUnit.SECONDS).
+        cache(cache).
+        proxy(proxy).
+        authenticator(authenticator).
+        build();
+   3.如果想单独给一个OkHttpClient对象设置一个单独的参数则可以调用OkHttpClient对象的newBuilder（）方法
+        OkHttpClient client = ...
+
+OkHttpClient clientWith60sTimeout = client.newBuilder().
+        readTimeout(60, TimeUnit.SECONDS).
+        build();
+		这段代码执行后，这个OkHttpClient对象的超时时间为60，其他的参数都和别的OkHttpClient对象的一样。
+二.Request类
+   Request类封装了请求报文信息：请求的Url地址、请求的方法（如GET、POST等）、各种请求头（如Content-Type、Cookie）以及可选的请求体。一般通过内部类Request.Builder的链式调用生成Request对象。
+三.Call类
+   Call代表了一个实际的HTTP请求，它是连接Request和Response的桥梁，通过OkHttpClient对象的newCall()方法（该方法接受一个Request对象为参数）可以得到一个Call对象。Call对象既支持同步获取数据，也可以异步获取数据。
+        执行Call对象的execute()方法，会阻塞当前线程去获取数据，该方法返回一个Response对象。
+        执行Call对象的enqueue()方法，不会阻塞当前线程，该方法接收一个Callback对象，当异步获取到数据之后，会回调执行Callback对象的相应方法。如果请求成功，则执行Callback对象的onResponse方法，并将Response对象传入该方法中；如果请求失败，则执行Callback对象的onFailure方法。
+	okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                //参数中的Response对象就是请求成功后返回的Response对象，我们想要对得到的数据做什么操作都是处理这个Response对象来实现的
+            }
+        });
+四.Response类
+   Response类封装了响应报文信息：状态吗（200、404等）、响应头（Content-Type、Server等）以及可选的响应体。可以通过Call对象的execute()方法获得Response对象，异步回调执行Callback对象的onResponse方法时也可以获取Response对象。

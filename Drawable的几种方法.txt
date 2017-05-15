@@ -1,0 +1,9 @@
+1.drawable.getIntrinsicWidth();
+  drawable.getIntrinsicHeight();
+  这两个方法分别可以获得Drawable对象的真实的宽高
+2.setBounds（int,int,int,int）
+  drawable的这个方法是在canvas上draw的时候用来设置在canvas上绘制的区域的（区域就是四个坐标确定的四个角的矩形）
+3.BitmapShader类
+  Shader：着色器
+  BitmapShader bitmapShader = new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
+  这段代码的意思是根据传入的bitmap图像上相应位置的点的颜色进行着色，也就是说使用这个bitmap作为背景，比如一个画笔Paint调用了setShader（bitmapShader），之后再通过这个画笔画东西都是”看不见的“，因为每一点的颜色都和bitmap相应点的颜色一样，表现出来就是看不见，也可以理解为paint画出来的东西都是透明的。通过BitmapShader的这个性质，可以为Paint对象set一个shader来实现椭圆，圆等不同形状的图片显示。

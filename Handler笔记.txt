@@ -1,0 +1,34 @@
+Handler
+　　Handler，它直接继承自Object，一个Handler允许发送和处理Message或者Runnable对象，并且会关联到主线程的MessageQueue中。每个Handler具有一个单独的线程，并且关联到一个消息队列的线程，就是说一个Handler有一个固有的消息队列。当实例化一个Handler的时候，它就承载在一个线程和消息队列的线程，这个Handler可以把Message或Runnable压入到消息队列，并且从消息队列中取出Message或Runnable，进而操作它们。
+　　Handler主要有两个作用：
+在工作线程中发送消息。
+在UI线程中获取、处理消息。
+　　上面介绍到Handler可以把一个Message对象或者Runnable对象压入到消息队列中，进而在UI线程中获取Message或者执行Runnable对象，所以Handler把压入消息队列有两大体系，Post和sendMessage：
+    1.Post：Post允许把一个Runnable对象入队到消息队列中。它的方法有：
+      post(Runnable)、postAtTime(Runnable,long)、postDelayed(Runnable,long)。
+    2.sendMessage：sendMessage允许把一个包含消息数据的Message对象压入到消息队列中。它的方法有：
+      sendEmptyMessage(int)、sendMessage(Message)、sendMessageAtTime(Message,long)、sendMessageDelayed(Message,long)。
+    3.handleMessage(Message msg):Handler处理消息的方法，一般用于重写来实现不同线程之间的交互
+	4.final boolean hasMessage（int what）：检查是否含有what为指定值的message
+	final boolean hasMessage（int what，Object obj）：检查是否含有what值为指定值而且object属性为指定对象的message
+　　从上面的各种方法可以看出，不管是post还是sendMessage都具有多种方法，它们可以设定Runnable对象和Message对象被入队到消息队列中，是立即执行还是延迟执行。
+
+二.Handler，Looper，MessageQueue
+      1.Looper：每个线程只能拥有一个Looper，Looper的loop方法采取循环的方式读取MessageQueue中的消息并且把消息发送给handler来处理，可以看出Looper是用来管理MessageQueue的
+      2.MessageQueue：消息队列，通过先进先出的方式来管理Message，程序创建Looper对象时会自动创建一个MessageQueue。
+   
+     我们重新来理解handler，handler发送消息到MessageQueue中，所以当前线程中必须有一个MessageQueue，而MessageQueue又是由Looper创建的，所以归根到底当前线程中必须有且只能有一个Looper对象。Looper的构造器是private修饰的，所以我们不能够调用，但是Looper的prepare静态方法内部调用了Looper的构造器，所以创建Looper对象就是直接Looper.prepare（）；就行了。而上面说过MessageQueue中的消息发送给handler需要loop方法，所以最后还要Looper.loop（）；这一句代码。
+      注意：前面说过每一个线程只能有一个Looper，所以启动新线程的时候一定要Looper.prepare（）；来创建一个Looper对象。由于在UI线程中系统已经初始化一个Looper对象了，因此程序直接创建Handler即可。
+	  
+三.Message类
+Message
+　　Handler如果使用sendMessage的方式把消息入队到消息队列中，需要传递一个Message对象，而在Handler中，需要重写handleMessage()方法，用于获取工作线程传递过来的消息，此方法运行在UI线程上。下面先介绍一下Message。
+　　Message是一个final类，所以不可被继承。Message封装了线程中传递的消息，如果对于一般的数据，Message提供了getData()和setData()方法来获取与设置数据，其中操作的数据是一个Bundle对象，这个Bundle对象提供一系列的getXxx()和setXxx()方法用于传递基本数据类型的键值对，对于基本数据类型，使用起来很简单，这里不再详细讲解。而对于复杂的数据类型，如一个对象的传递就要相对复杂一些。在Bundle中提供了两个方法，专门用来传递对象的，但是这两个方法也有相应的限制，需要实现特定的接口，当然，一些Android自带的类，其实已经实现了这两个接口中的某一个，可以直接使用。方法如下：
+       putParcelable(String key,Parcelable value)：需要传递的对象类实现Parcelable接口。
+       pubSerializable(String key,Serializable    value)：需要传递的对象类实现Serializable接口。
+　　还有另外一种方式在Message中传递对象，那就是使用Message自带的obj属性传值，它是一个Object类型，所以可以传递任意类型的对象，Message自带的有如下几个属性：
+       int arg1：参数一，用于传递不复杂的数据，复杂数据使用setData()传递。
+       int arg2：参数二，用于传递不复杂的数据，复杂数据使用setData()传递。
+       Object obj：传递一个任意的对象。
+       int what：定义的消息码，一般用于设定消息的标志。
+　　对于Message对象，一般并不推荐直接使用它的构造方法得到，而是建议通过使用Message.obtain()这个静态的方法或者Handler.obtainMessage()获取。Message.obtain()会从消息池中获取一个Message对象，如果消息池中是空的，才会使用构造方法实例化一个新Message，这样有利于消息资源的利用。并不需要担心消息池中的消息过多，它是有上限的，上限为10个。Handler.obtainMessage()具有多个重载方法，如果查看源码，会发现其实Handler.obtainMessage()在内部也是调用的Message.obtain()。　　

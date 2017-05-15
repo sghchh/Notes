@@ -1,0 +1,172 @@
+摘自：掘进网
+Service
+Service 和Activity 一样同为Android 的四大组件之一，并且他们都有各自的生命周期，要想掌握Service 的用法，那就要了解Service 的生命周期有哪些方法，并且生命周期中各个方法回调的时机和作用。有一点比较重要，Service 有两种启动方式，并且它的两种启动方式的生命周期是不一样的。接下来分别看一下两种启动方式各自的生命周期方法。
+startService方式启动Service
+当应用组件通过startService方法来启动Service 时，Service 则会处于启动状态，一旦服务启动，它就会在后台无限期的运行，生命周期独立于启动它的组件，即使启动它的组件已经销毁了也不受任何影响，由于启动的服务长期运行在后台，这会大量消耗手机的电量，因此，我们应该在任务执行完成之后调用stopSelf()来停止服务，或者通过其他应用组件调用stopService 来停止服务。
+startService 启动服务后，会执行如下生命周期：onCreate() －> onStartCommand() －> onStart()(现在已经废弃) －> onDestroy() 。具体看一下它的几个生命周期方法：
+onCreate() :首次启动服务的时候，系统会调用这个方法，在onStartCommand 和 onBind 方法之前，如果服务已经启动起来了，再次启动时，则不会调用此方法，因此可以在onCreate 方法中做一些初始化的操作，比如要执行耗时的操作，可以在这里创建线程，要播放音乐，可以在这里初始化音乐播放器。
+onStartCommand(): 当通过startService 方法来启动服务的时候，在onCreate 方法之后就会回调这个方法，此方法调用后，服务就启动起来了，将会在后台无限期的运行，直到通过stopService 或者 stopSelf 方法来停止服务。
+onDestroy():当服务不再使用且将被销毁时，系统将调用此方法。服务应该实现此方法来清理所有资源，如线程、注册的侦听器、接收器等。 这是服务接收的最后一个调用。
+了解了这几个生命周期方法后，我们就来写一个简单Service 。
+要使用Service 就要通过继承Service类（或者继承IntentService ,侯文会讲）来实现，代码如下：
+public class SimpleService extends Service {
+    public static final String TAG = "SimpleService";
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        Log.i(TAG,"call onBind...");
+        return null;
+    }
+
+    @Override
+    public void onCreate() {
+        Log.i(TAG,"call onCreate...");
+    }
+
+    @Override
+    public void onStart(Intent intent, int startId) {
+        Log.i(TAG,"call onStart...");
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(TAG,"call onStartCommand...");
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.i(TAG,"call onDestroy...");
+    }
+
+
+
+}
+Service类写好了之后，我们需要在清单文件中注册一下，在application标签下：
+        <service android:name=".service.SimpleService"
+                 android:exported="false"
+            />
+写好了Service并且在清单文件注册之后，我们就可以启动Service了，启动Service和启动Activity 差不多，通过Intent 来启动，代码如下：
+  @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.start_service:
+                Intent intent = new Intent(this,SimpleService.class);
+                // 启动服务
+                startService(intent);
+                break;
+            case R.id.stop_service:
+                Intent service = new Intent(this,SimpleService.class);
+                // 停止服务
+                stopService(service);
+                break;
+        }
+    }
+
+
+界面.png
+
+如上图界面所示，有2 个button ，分别是启动服务和停止服务，分别点击 startService 和StopService 的button ,看看生命周期回调方法打印的日志：
+
+生命周期打印日志.png
+
+小结：通过startService 方式启动的服务，服务会无限期的在后台运行，直到通过stopService 或 stopSelf 来终止服务。服务独立于启动它的组件，也就是说，当组件启动服务后，组件和服务就在也没有关系了，就算启动它的组件被销毁了，服务照样在后台运行。通过这种方式启动的服务不好与组件之间通信。
+bindService 方式启动服务
+除了startService 来启动服务之外，另外一种启动服务的方式就是通过bindService 方法了，也就是绑定服务，其实通过它的名字就容易理解，绑定即将启动组件和服务绑定在一起。前面讲的通过startService 方式启动的服务是与组件相独立的，即使启动服务的组件被销毁了，服务仍然在后台运行不受干扰。但是通过bindSerivce 方式绑定的服务就不一样了，它与绑定组件的生命周期是有关的。如下：
+多个组件可以绑定到同一个服务上，如果只有一个组件绑定服务，当绑定的组件被销毁时，服务也就会停止了。如果是多个组件绑定到一个服务上，当绑定到该服务的所有组件都被销毁时，服务才会停止。
+bindService 绑定服务 和startService 的生命周期是不一样，bindServie 的生命周期如下：onCreate －> onBind －> onUnbind －>onDestroy。其中重要的就是onBind 和onUnbind 方法。
+onBind(): 当其他组件想通过bindService 与服务绑定时，系统将会回调这个方法，在实现中，你必须返回一个IBinder接口，供客户端与服务进行通信，必须实现此方法，这个方法是Service 的一个抽象方法，但是如果你不允许绑定的话，返回null 就可以了。
+onUnbind(): 当所有与服务绑定的组件都解除绑定时，就会调用此方法。
+了解了这2个方法后，我们来看一下怎么绑定一个服务。
+1，首先，添加一个类 继承 Binder ,在Binder 类中添加其他组件要与服务交互的方法，并在onBind() 方法中返回IBinder 实例对象：
+public class SimpleService extends Service {
+    public static final String TAG = "SimpleService";
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        Log.i(TAG,"call onBind...");
+        //返回IBinder 接口对象
+        return new MyBinder();
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Log.i(TAG,"call onUnbind...");
+        return super.onUnbind(intent);
+    }
+
+    @Override
+    public void onCreate() {
+        Log.i(TAG,"call onCreate...");
+    }
+
+    @Override
+    public void onStart(Intent intent, int startId) {
+        Log.i(TAG,"call onStart...");
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(TAG,"call onStartCommand...");
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.i(TAG,"call onDestroy...");
+    }
+
+    // 添加一个类继承Binder
+    public  class MyBinder extends Binder{
+        // 添加要与外界交互的方法
+        public String  getStringInfo(){
+          return "调用了服务中的方法";
+        }
+    }
+
+}
+2, 绑定服务的时候，需要提供一个ServiceConnection 接口，在接口回调中获取Binder 对象，与服务进行通信。
+ private SimpleService.MyBinder mMyBinder;
+    // 绑定/解除绑定 Service 回调接口
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            // 绑定成功后回调
+            //1 ,获取Binder接口对象
+            mMyBinder = (SimpleService.MyBinder) service;
+            //2, 从服务获取数据
+            String content = mMyBinder.getStringInfo();
+            // 3,界面提示
+            Toast.makeText(ServiceSimpleActivity.this,content,Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+           // 解除绑定后回调
+            mMyBinder = null;
+        }
+    };
+3,绑定和解除绑定服务
+            case R.id.bind_service:
+                Intent intent = new Intent(this,SimpleService.class);
+                // 绑定服务
+                bindService(intent,mConnection, Context.BIND_AUTO_CREATE);
+                break;
+            case R.id.unbind_service:
+                // 解除绑定服务
+                unbindService(mConnection);
+
+                break;
+点击绑定按钮，即绑定服务，并且在onServiceConnected 中得到MyBinder 对象，就可以通过这个对象和服务通信了，例子中我们Toast 了从服务中获取的字符串：
+
+IntentService
+IntentService 是继承自 Service 的，所以它本质上还是一个 Service 。在 IntentService 内部维护了一个 WorkerThread 来专门处理耗时操作，实际上它会将所有 IntentService 的业务操作都放在 WorkerThread 中执行。
+如果 start 了多次相同的 IntentService ，那么每一次 start 的任务，都会在 WorkerThread 中依次执行。而最让我们省心的是，IntentService 在执行完这些任务之后，会调用 stopSelf() 结束自己。
+从官方文档可以了解到，一些 IntentService 的特点：
+它会创建独立的 WorkerThread 来处理所有的 Intent 请求。
+它会创建独立的 WorkerThread 来处理 onHandleIntent() 的实现代码，无需担心多线程的问题。
+所有请求完成之后，IntentService 会自动停止。
+它的 onBind() 默认返回 null，不要去实现它，不要用 bindService() 绑定一个 IntentService。
+它的 onStartCommand() 提供了默认的实现，会将请求的 Intent 添加到队列中。
+从上面的介绍可以了解到，在 IntentService 开启了一个独立的 WorkerThread 来完成具体任务的执行，而我们只需要将需要完成的业务代码，在 onHandleIntent() 中实现即可。
+

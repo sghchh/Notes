@@ -1,0 +1,13 @@
+Window：窗口，所有的View都需要依附在一个Window上，即只要有View就一定有Window。window我们是看不见的，看到的是View
+window是一个抽象类，具体的实现类是PhoneWindow，而PhoneWindow有一个内部类，他就是DecorView（注意：是内部类），之所以重点介绍这个类是因为它涉及到Activity界面view显示的机制。
+上面说这么多都只是Window窗口类，我们用来操作这些东西的方法都封装在WindowManager接口中。WindowManager接口继承自ViewManager，是外界访问Window的入口，提供了add/remove/update的方法操作View。
+一.描述一个Window：布局参数
+   WindowManager.LayoutParams是WindowManager的一个内部类（继承自ViewGroup.LayoutParams类），下面介绍几个重要的参数：
+   1.width：描述窗口的宽度，该变量是父类ViewGroup.LayoutParams的成员变量。
+   2.height：描述窗口的高度，该变量同样是父类ViewGroup.LayoutParams的成员变量。
+   3.x：描述窗口的起点X轴的坐标。
+   4.y：描述窗口起点Y轴的坐标。
+   5.type：窗口的类型，分为三个大类型：应用窗口，子窗口，系统窗口。
+   6.flag：窗口特征标记，比如是否全屏，是否隐藏标题栏等。
+   7.gravity：窗口的对齐方式，居中还是置顶或者置底等等。
+   
