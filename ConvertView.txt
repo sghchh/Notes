@@ -1,0 +1,72 @@
+相信大家在很多时候都会用到ListView这个控件，因为确实是用的很多很多，但是有木有遇到过当数据很多很多的时候，往下滑ListView时有时候会卡顿，这就需要我们来优化它了。
+ 
+ListView优化主要有下面几个方面：
+1、convertView重用
+2、ViewHolder的子View复用
+3、缓存数据复用
+ 
+一、convertView重用
+首先讲下ListView的原理：ListView中的每一个Item显示都需要Adapter调用一次getView()的方法，这个方法会传入一个convertView的参数，这个方法返回的View就是这个Item显示的View。如果当Item的数量足够大，再为每一个Item都创建一个View对象，必将占用很多内存空间，即创建View对象（mInflater.inflate(R.layout.lv_item, null);从xml中生成View，这是属于IO操作）是耗时操作，所以必将影响性能。Android提供了一个叫做Recycler(反复循环)的构件，就是当ListView的Item从滚出屏幕视角之外，对应Item的View会被缓存到Recycler中，相应的会从生成一个Item，而此时调用的getView中的convertView参数就是滚出屏幕的缓存Item的View，所以说如果能重用这个convertView，就会大大改善性能。
+那么，我们怎么重用它呢？贴代码：
+//在这里声明一下 holder 就是为了在 else 里边用的时候不至于 是空的
+    ViewHolder holder;
+    // 通过加了 if (convertView != null) 这个判断条件。就省略了重复创建的浪费资源的情况
+    if (convertView == null) {
+        convertView = View.inflate ( context, R.layout.item_main , null);
+        holder = new ViewHolder();
+
+        holder. tv_item_name = (TextView) convertView.findViewById(R.id. tv_item_name);
+        holder. tv_item_word = (TextView) convertView.findViewById(R.id. tv_item_word);
+        //可以将 setTag 理解成为一种容器方法。先将初始化好的 holder 存储在 convertView 里边
+        convertView.setTag(holder);
+    } else {
+        //得到的 holder 是已经 findviewbyId 好了的。就不用再去 findviewbyid 了。也是一种优化
+        holder = (ViewHolder) convertView.getTag();
+      /*
+       加载数据的方法不能写在这里边。因为刚开始 convertVie==null 的时候是不执行的。也就是将
+       原来自己布局中的数据记载到了屏幕上
+       holder.tv_item_word.setText(data.get(position).getPinyin().substring(0, 1));
+        holder.tv_item_name.setText(data.get(position).getName());*/
+
+    }
+    // 装配数据
+    holder. tv_item_word.setText( data .get(position).getPinyin().substring( 0, 1));
+    holder.tv_item_name .setText( data.get(position).getName());
+    return convertView;
+}
+
+当这个convertView不存在时，即第一次使用它，我们就创建一个item布局的View对象并赋给convertView，以后使用convertView时，只需从convertView中getTag取出来就可以，不需要再次创建item的布局对象了，这样便提高了性能。
+二、使用ViewHolder重用
+我们都知道在getView()方法中的操作是这样的：先从xml中创建view对象（inflate操作，我们采用了重用convertView方法优化），然后在这个view去findViewById，找到每一个item的子View的控件对象，如：ImageView、TextView等。这里的findViewById操作是一个树查找过程，也是一个耗时的操作，所以这里也需要优化，就是使用ViewHolder，把每一个item的子View控件对象都放在Holder中，当第一次创建convertView对象时，便把这些item的子View控件对象findViewById实例化出来并保存到ViewHolder对象中。然后用convertView的setTag将viewHolder对象设置到Tag中， 当以后加载ListView的item时便可以直接从Tag中取出复用ViewHolder对象中的，不需要再findViewById找item的子控件对象了。这样便大大提高了性能。
+贴个完整的代码：
+
+ViewHolder holder;
+    // 通过加了 if (convertView != null) 这个判断条件。就省略了重复创建的浪费资源的情况
+    if (convertView == null) {
+        convertView = View.inflate ( context, R.layout.item_main , null);
+        holder = new ViewHolder();
+
+        holder. tv_item_name = (TextView) convertView.findViewById(R.id. tv_item_name);
+        holder. tv_item_word = (TextView) convertView.findViewById(R.id. tv_item_word);
+        //可以将 setTag 理解成为一种容器方法。先将初始化好的 holder 存储在 convertView 里边
+        convertView.setTag(holder);
+    } else {
+        //得到的 holder 是已经 findviewbyId 好了的。就不用再去 findviewbyid 了。也是一种优化
+        holder = (ViewHolder) convertView.getTag();
+      /*
+       加载数据的方法不能写在这里边。因为刚开始 convertVie==null 的时候是不执行的。也就是将
+       原来自己布局中的数据记载到了屏幕上
+       holder.tv_item_word.setText(data.get(position).getPinyin().substring(0, 1));
+        holder.tv_item_name.setText(data.get(position).getName());*/
+
+    }
+    // 装配数据
+    holder. tv_item_word.setText( data .get(position).getPinyin().substring( 0, 1));
+    holder.tv_item_name .setText( data.get(position).getName());
+    return convertView;
+}
+
+static class ViewHolder {
+    private TextView tv_item_word;
+    private TextView tv_item_name;
+}
