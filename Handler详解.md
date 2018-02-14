@@ -1,4 +1,4 @@
-#Handler详解  
+# Handler详解  
 提到Handler就不得不提Looper和MessageQueue了，他们之间的关系如下：  
 
 * Handler负责消息的发送和处理：Handler发送消息给MessageQueue和接收Looper返回的消息并且处理消息  
@@ -25,6 +25,8 @@
         mCallback = callback;
         mAsynchronous = async;
     }  
+>在源码中，其构造器的参数还可以带一个Looper，不管其他形式的构造器如何，本质都是调用的Looper(Callback,boolean)这个构造器；带Looper的构造器将**mLooper=Looper.mylooper()换成了mLooper=looper**
+
 可以看到，**Handler进行交互的MessageQueue其实是Looper中的MessageQueue。**而首先获取Looper对象的方法是Looper的mylooper（）静态方法，如果这时候抛出异常说明没有执行Looper.prepare()方法。接下来看看Looper.mylooper()和Looper.prepare()方法：  
 
 	static final ThreadLocal<Looper> sThreadLocal = new ThreadLocal<Looper>();
